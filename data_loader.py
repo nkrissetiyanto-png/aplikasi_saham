@@ -2,48 +2,66 @@ import yfinance as yf
 import pandas as pd
 import requests
 
-def load_data(ticker, source="Yahoo Finance", period="1y"):
-    if source == "Yahoo Finance":
-        return load_yfinance(ticker, period)
-    else:
-        return load_tokocrypto(ticker)
 
-# ====== 1. YAHOO FINANCE ======
-def load_yfinance(ticker, period="1y"):
-    df = yf.download(ticker, period=period, interval="1d", auto_adjust=False)
+# =============================
+# LOAD DATA YAHOO FINANCE
+# =============================
+def load_yahoo_data(ticker, period="1y"):
+    try:
+        df = yf.download(ticker, period=period, interval="1d", auto_adjust=False)
+        if df is None or df.empty:
+            return None
 
-    if df.empty:
-        raise ValueError(f"❌ Data kosong dari Yahoo Finance untuk {ticker}")
+        df = df.dropna()
+        df = df[["Open", "High", "Low", "Close", "Volume"]]   # kolom wajib
+        return df
 
-    df = df.dropna()
-    df.reset_index(inplace=True)   # pastikan ada kolom 'Date'
-    return df
+    except Exception as e:
+        print("Error load_yahoo_data:", e)
+        return None
 
 
-# ====== 2. TOKOCRYPTO API (24 Jam) ======
-def load_tokocrypto(pair="BTC_USDT", interval="15m", limit=200):
+# =============================
+# LOAD DATA TOKOCRYPTO (PUBLIC API)
+# =============================
+def load_toko_data(symbol, interval="1d", limit=365):
     url = "https://api.tokocrypto.com/open/v1/klines"
+
     params = {
-        "symbol": pair,
+        "symbol": symbol,
         "interval": interval,
         "limit": limit
     }
 
-    resp = requests.get(url, params=params)
-    data = resp.json()
+    try:
+        r = requests.get(url, params=params)
+        if r.status_code != 200:
+            print("HTTP gagal:", r.text)
+            return None
 
-    if "data" not in data:
-        raise ValueError("❌ API Tokocrypto tidak mengembalikan data.")
+        data = r.json().get("data", None)
+        if not data:
+            return None
 
-    df = pd.DataFrame(data["data"])
-    if df.empty:
-        raise ValueError(f"❌ Data Tokocrypto kosong untuk {pair}")
+        df = pd.DataFrame(data, columns=[
+            "open_time", "open", "high", "low", "close", "volume",
+            "close_time", "quote_asset_volume", "num_trades",
+            "taker_buy_base", "taker_buy_quote", "ignore"
+        ])
 
-    # Tokocrypto mengembalikan: [open, high, low, close, volume, closeTime]
-    df.columns = ["Open", "High", "Low", "Close", "Volume", "CloseTime"]
-    df["Date"] = pd.to_datetime(df["CloseTime"], unit="ms")
+        df = df[["open", "high", "low", "close", "volume"]].astype(float)
+        df.rename(columns={
+            "open": "Open",
+            "high": "High",
+            "low": "Low",
+            "close": "Close",
+            "volume": "Volume"
+        }, inplace=True)
 
-    df = df[["Date", "Open", "High", "Low", "Close", "Volume"]]
-    df = df.dropna()
+        df.index = pd.date_range(end=pd.Timestamp.utcnow(), periods=len(df), freq="D")
 
-    return df
+        return df
+
+    except Exception as e:
+        print("Error load_toko_data:", e)
+        return None
