@@ -11,6 +11,15 @@ def reconstruct_intraday(df, intervals=15):
     for idx, row in df.iterrows():
         O, H, L, C, V = row["Open"], row["High"], row["Low"], row["Close"], row["Volume"]
 
+        # VALIDASI DATA WAJIB - FIX AMBIGUOUS SERIES ERROR
+        if any(pd.isna([O, H, L, C, V])):
+            continue
+
+        try:
+            O, H, L, C, V = float(O), float(H), float(L), float(C), float(V)
+        except:
+            continue
+
         if V == 0 or (H - L) == 0:
             continue
 
@@ -18,17 +27,19 @@ def reconstruct_intraday(df, intervals=15):
         vols = np.abs(np.random.normal(V/intervals, V/(intervals*4), intervals))
 
         temp = pd.DataFrame({
-            "Datetime":[idx + pd.Timedelta(minutes=15*i) for i in range(intervals)],
-            "Price":prices,
-            "Volume":vols
+            "Datetime": [idx + pd.Timedelta(minutes=15*i) for i in range(intervals)],
+            "Price": prices,
+            "Volume": vols
         })
 
         out.append(temp)
 
+    if not out:
+        return pd.DataFrame(columns=["Datetime","Price","Volume"])  # fallback
+
     full = pd.concat(out)
     full.reset_index(drop=True, inplace=True)
     return full
-
 
 def train_models(intraday):
     intraday = smart_money_features(intraday)
