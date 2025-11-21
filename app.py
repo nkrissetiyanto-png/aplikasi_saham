@@ -1,11 +1,15 @@
 import streamlit as st
-from streamlit_autorefresh import st_autorefresh
 import plotly.graph_objects as go
 
 from data_loader import load_data
 from prediksi_engine import reconstruct_intraday, train_models, predict_next_15m
 from strategy import get_signal
 from notifier import send_alert
+import time
+
+# Auto-refresh setiap 15 menit
+st.write("Auto refresh aktif setiap 15 menit...")
+st.experimental_set_query_params(ts=int(time.time()))
 
 st.set_page_config(page_title="Nanang AI Trading", layout="wide")
 
@@ -15,8 +19,6 @@ st.markdown(
     </style>""", unsafe_allow_html=True)
 
 st.title("🚀 Nanang AI — Prediksi Saham 15 Menit (Dark Mode)")
-
-st_autorefresh(interval=900000, key="refresh")
 
 data = load_data()
 intraday = reconstruct_intraday(data)
