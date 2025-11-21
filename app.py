@@ -2,7 +2,6 @@ import streamlit as st
 import plotly.graph_objects as go
 
 from data_loader import load_data
-from prediksi_engine import reconstruct_intraday, train_models, predict_next_15m
 from strategy import get_signal
 from notifier import send_alert
 import time
@@ -22,8 +21,8 @@ st.title("🚀 Nanang AI — Prediksi Saham 15 Menit (Dark Mode)")
 
 data = load_data()
 intraday = reconstruct_intraday(data)
-xgb = train_models(intraday)
-prob, sm = predict_next_15m(xgb, intraday)
+model = train_models(intraday)
+prob, sm = predict_next_15m(model, intraday)
 
 signal = get_signal(prob, sm)
 
