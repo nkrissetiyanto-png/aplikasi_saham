@@ -2,7 +2,7 @@ pandas
 numpy
 yfinance
 scikit-learn
-xgboost==1.6.2
+lightgbm
 streamlit
 plotly
 pyyaml
