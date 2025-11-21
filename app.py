@@ -31,7 +31,15 @@ st.title("🚀 Nanang AI — Prediksi Saham 15 Menit (Dark Mode)")
 # Load data & model
 data = load_data()
 # Drop baris yang tidak lengkap
-data = data.dropna(subset=["Open", "High", "Low", "Close", "Volume"])
+required_cols = ["Open","High","Low","Close","Volume"]
+
+# Cek apakah data punya kolom OHLCV
+if not all(col in data.columns for col in required_cols):
+    st.error("❌ Data Yahoo Finance kosong / format tidak valid. Tidak ada kolom OHLCV.")
+    st.stop()
+
+# Drop NA hanya jika kolom lengkap
+data = data.dropna(subset=required_cols)
 
 if data.empty:
     st.error("Data dari Yahoo Finance kosong. Streamlit Cloud gagal mengambil data.")
