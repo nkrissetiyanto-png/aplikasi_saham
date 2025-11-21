@@ -2,9 +2,7 @@ pandas
 numpy
 yfinance
 scikit-learn
-xgboost==1.7.6
-tensorflow-macos
-tensorflow-metal
+xgboost==1.6.2
 streamlit
 plotly
 pyyaml
