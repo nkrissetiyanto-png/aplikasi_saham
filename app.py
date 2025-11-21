@@ -29,7 +29,13 @@ st.markdown(
 st.title("🚀 Nanang AI — Prediksi Saham 15 Menit (Dark Mode)")
 
 # PILIH SAHAM
-ticker = st.selectbox("Pilih Saham", ["BBNI.JK", "BRIS.JK"])
+# ticker = st.selectbox("Pilih Saham", ["BBNI.JK", "BRIS.JK"])
+ticker = st.selectbox("Pilih Aset", [
+    "BBNI.JK", "BRIS.JK",
+    "BTC-USD", "ETH-USD", "SOL-USD",
+    "EURUSD=X", "USDJPY=X", "XAUUSD=X",
+    "CL=F", "GC=F", "ES=F", "NQ=F"
+])
 
 # LOAD DATA
 data = load_data(ticker)
