@@ -1,0 +1,9 @@
+telegram:
+  token: "ISI_TOKEN_TELEGRAM_KAMU"
+  chat_id: "123456789"
+
+settings:
+  interval_minutes: 15
+  tickers:
+    - BBNI.JK
+    - BRIS.JK
