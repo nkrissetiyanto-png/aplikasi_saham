@@ -13,6 +13,7 @@ st.set_page_config(page_title="Nanang AI Trading", layout="wide")
 st.write("Auto refresh aktif setiap 15 menit...")
 if "last_refresh" not in st.session_state:
     st.session_state["last_refresh"] = time.time()
+    st.write(f"Last refresh at: {time.time()}")
 
 if time.time() - st.session_state["last_refresh"] > 900:
     st.session_state["last_refresh"] = time.time()
