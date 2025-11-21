@@ -8,10 +8,17 @@ def reconstruct_intraday(df, intervals=15):
     df = df.copy()
     out = []
 
-    for idx, row in df.iterrows():
+    # pastikan kolom datetime benar
+    if "Date" in df.columns:
+        df["Date"] = pd.to_datetime(df["Date"])
+
+    for _, row in df.iterrows():
+
+        idx = row["Date"]     # <-- FIX TERPENTING
+
         O, H, L, C, V = row["Open"], row["High"], row["Low"], row["Close"], row["Volume"]
 
-        # VALIDASI DATA WAJIB - FIX AMBIGUOUS SERIES ERROR
+        # validasi data
         if any(pd.isna([O, H, L, C, V])):
             continue
 
@@ -35,7 +42,7 @@ def reconstruct_intraday(df, intervals=15):
         out.append(temp)
 
     if not out:
-        return pd.DataFrame(columns=["Datetime","Price","Volume"])  # fallback
+        return pd.DataFrame(columns=["Datetime","Price","Volume"])
 
     full = pd.concat(out)
     full.reset_index(drop=True, inplace=True)
