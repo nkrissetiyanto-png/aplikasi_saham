@@ -38,8 +38,24 @@ ticker = st.selectbox("Pilih Aset", [
     "CL=F", "GC=F", "ES=F", "NQ=F"
 ])
 
+# PILIH SUMBER DATA
+source = st.selectbox("Sumber Data", ["Yahoo Finance", "Tokocrypto"])
+
+# PILIH ASET
+if source == "Yahoo Finance":
+    ticker = st.selectbox("Pilih Saham / Crypto (Yahoo)", [
+        "BBNI.JK", "BRIS.JK", 
+        "BTC-USD", "ETH-USD", "SOL-USD"
+    ])
+else:
+    ticker = st.selectbox("Pilih Aset Tokocrypto", [
+        "BTC_USDT", "ETH_USDT", "SOL_USDT"
+    ])
+
 # LOAD DATA
-data = load_data(ticker)
+# data = load_data(ticker)
+data = load_data(ticker, source=source)
+
 
 # CEK DATA VALID
 required_cols = ["Open","High","Low","Close","Volume"]
