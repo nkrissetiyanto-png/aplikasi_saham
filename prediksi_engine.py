@@ -8,14 +8,25 @@ def reconstruct_intraday(df, intervals=15):
     df = df.copy()
     out = []
 
-    for idx, row in df.iterrows():
-        O, H, L, C, V = row["Open"], row["High"], row["Low"], row["Close"], row["Volume"]
+    # Jika DF kosong → langsung return DF kosong
+    if df is None or df.empty:
+        return pd.DataFrame(columns=["Datetime", "Price", "Volume"])
 
-        # Skip aneh
-        if V == 0 or (H - L) == 0:
+    for idx, row in df.iterrows():
+        try:
+            O = float(row["Open"])
+            H = float(row["High"])
+            L = float(row["Low"])
+            C = float(row["Close"])
+            V = float(row["Volume"])
+        except:
+            continue  # skip bar aneh
+
+        # Skip bar yang tidak valid
+        if V <= 0 or (H - L) <= 0:
             continue
 
-        # Buat interpolasi harga intraday
+        # Buat interpolasi intraday
         prices = np.linspace(O, C, intervals) + np.random.normal(0, (H-L)/25, intervals)
         vols = np.abs(np.random.normal(V/intervals, V/(intervals*4), intervals))
 
