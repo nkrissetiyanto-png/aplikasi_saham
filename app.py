@@ -20,8 +20,8 @@ st_autorefresh(interval=900000, key="refresh")
 
 data = load_data()
 intraday = reconstruct_intraday(data)
-xgb, lstm = train_models(intraday)
-prob, sm = predict_next_15m(xgb, lstm, intraday)
+xgb = train_models(intraday)
+prob, sm = predict_next_15m(xgb, intraday)
 
 signal = get_signal(prob, sm)
 
