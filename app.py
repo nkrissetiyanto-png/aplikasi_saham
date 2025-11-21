@@ -30,6 +30,13 @@ st.title("🚀 Nanang AI — Prediksi Saham 15 Menit (Dark Mode)")
 
 # Load data & model
 data = load_data()
+# Drop baris yang tidak lengkap
+data = data.dropna(subset=["Open", "High", "Low", "Close", "Volume"])
+
+if data.empty:
+    st.error("Data dari Yahoo Finance kosong. Streamlit Cloud gagal mengambil data.")
+    st.stop()
+
 intraday = reconstruct_intraday(data)
 model = train_models(intraday)
 prob, sm = predict_next_15m(model, intraday)
