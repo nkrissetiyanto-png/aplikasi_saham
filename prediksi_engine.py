@@ -8,40 +8,26 @@ def reconstruct_intraday(df, intervals=15):
     df = df.copy()
     out = []
 
-    # pastikan kolom datetime benar
-    if "Date" in df.columns:
-        df["Date"] = pd.to_datetime(df["Date"])
-
-    for _, row in df.iterrows():
-
-        idx = row["Date"]     # <-- FIX TERPENTING
-
+    for idx, row in df.iterrows():
         O, H, L, C, V = row["Open"], row["High"], row["Low"], row["Close"], row["Volume"]
 
-        # validasi data
-        if any(pd.isna([O, H, L, C, V])):
-            continue
-
-        try:
-            O, H, L, C, V = float(O), float(H), float(L), float(C), float(V)
-        except:
-            continue
-
+        # Skip aneh
         if V == 0 or (H - L) == 0:
             continue
 
+        # Buat interpolasi harga intraday
         prices = np.linspace(O, C, intervals) + np.random.normal(0, (H-L)/25, intervals)
         vols = np.abs(np.random.normal(V/intervals, V/(intervals*4), intervals))
 
         temp = pd.DataFrame({
-            "Datetime": [idx + pd.Timedelta(minutes=15*i) for i in range(intervals)],
-            "Price": prices,
-            "Volume": vols
+            "Datetime":[idx + pd.Timedelta(minutes=15*i) for i in range(intervals)],
+            "Price":prices,
+            "Volume":vols
         })
 
         out.append(temp)
 
-    if not out:
+    if len(out) == 0:
         return pd.DataFrame(columns=["Datetime","Price","Volume"])
 
     full = pd.concat(out)
