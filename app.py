@@ -21,26 +21,25 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.write("Auto refresh aktif setiap 15 menit...")
-st.experimental_set_query_params(ts=int(time.time()))
-
-
-# =============================
-# TITLE
-# =============================
 st.title("🚀 Nanang AI — Prediksi Saham 15 Menit (Dark Mode)")
 
-# =============================
-# DROPDOWN 1 — PILIH SUMBER DATA
-# =============================
-source = st.selectbox("Sumber Data", ["Yahoo Finance", "Tokocrypto"])
-# ==== AUTO REFRESH KHUSUS TOKOCRYPTO ====
-if source == "Tokocrypto":
-    from streamlit_autorefresh import st_autorefresh
-    st_autorefresh(interval=60_000, key="tokocrypto_1m_refresh")
 
 # =============================
-# DROPDOWN 2 — PILIH ASET SESUAI SUMBER
+# DROPDOWN 1 — SUMBER DATA
+# =============================
+source = st.selectbox("Sumber Data", ["Yahoo Finance", "Tokocrypto"])
+
+
+# =============================
+# AUTO REFRESH KHUSUS TOKOCRYPTO (1 MENIT)
+# =============================
+if source == "Tokocrypto":
+    from streamlit_autorefresh import st_autorefresh
+    st_autorefresh(interval=60_000, key="tokocrypto_refresh")
+
+
+# =============================
+# DROPDOWN 2 — ASET SESUAI SUMBER
 # =============================
 if source == "Yahoo Finance":
     ticker = st.selectbox("Pilih Saham / Crypto (Yahoo)", [
@@ -52,9 +51,6 @@ else:
         "BTC_USDT", "ETH_USDT", "SOL_USDT"
     ])
 
-if source == "Tokocrypto":
-    st_autorefresh = st.experimental_rerun
-    st_autorefresh()
 
 # =============================
 # LOAD DATA
